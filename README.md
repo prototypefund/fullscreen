@@ -4,3 +4,6 @@
 
 
 Source code for the [fullscreen.space](https://fullscreen.space) website.
+
+![](https://raw.githubusercontent.com/interalia-studio/fullscreen/main/src/assets/images/logo-bmbf.svg?sanitize=true&token=GHSAT0AAAAAABRLRQLK5ODVLLSCJXSYWH6OYQ6F6EQ)
+![](https://raw.githubusercontent.com/interalia-studio/fullscreen/main/src/assets/images/logo-okfn.svg?sanitize=true&token=GHSAT0AAAAAABRLRQLLKPSSWQCRZ65QISQ6YQ6F6UQ)
