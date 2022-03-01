@@ -1,0 +1,32 @@
+{
+  "name": "fullscreen",
+  "version": "0.0.1",
+  "description": "The https://fullscreen.space website",
+  "private": true,
+  "source": "src/index.html",
+  "author": "Interalia",
+  "license": "ISC",
+  "homepage": "https://github.com/interalia-studio/fullscreen#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/interalia-studio/fullscreen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/interalia-studio/fullscreen/issues"
+  },
+  "scripts": {
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "windups": "^1.1.9"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "parcel": "^2.3.2"
+  },
+  "browserslist": "> 0.5%, last 2 versions, not dead"
+}
