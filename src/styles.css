@@ -1,10 +1,13 @@
-body {
+html, body {
     background-color: #FFCC33;
+    margin: 0;
+    padding: 0;
 }
 
 main {
     width: 100vw;
     height: 100vh;
+    overflow: hidden;
 }
 
 .logos {
@@ -17,7 +20,7 @@ main {
     width: 30%;
 }
 
-@media only screen and  (min-width: 400px) {
+@media only screen and (min-width: 400px) {
     .logos {
         justify-content: center;
         flex-direction: row;
