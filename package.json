@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "parcel",
-    "build": "parcel build"
+    "build:web": "parcel build"
   },
   "dependencies": {
     "react": "^17.0.2",
