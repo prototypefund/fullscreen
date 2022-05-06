@@ -1,11 +1,12 @@
-import { Tldraw } from "@tldraw/tldraw";
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { TldrawApp } from "@tldraw/tldraw";
-import { useCallback, useState } from "react";
+import { Tldraw, TldrawApp } from "@tldraw/tldraw";
+import { appWindow } from "@tauri-apps/api/window";
+import React, { useEffect, useCallback, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { v4 as uuid } from "uuid";
 
 import { useYjsSession } from "../adapters/yjs";
 import fileSystem from "../lib/fileSystem";
+import { isNativeApp } from "../lib/tauri";
 import store from "../adapters/yjs/store";
 
 const Board = () => {
@@ -22,11 +23,9 @@ const Board = () => {
     [boardId]
   );
 
-  const session = useYjsSession(app, boardId);
+  const session = useYjsSession(app, boardId, handleMount);
 
-  // console.log(store.board.get("id"));
-
-  const handleNewProject = (app1: TldrawApp) => {
+  const handleNewProject = () => {
     const newBoardId = session.createDocument();
     navigate(`/board/${newBoardId}`);
   };
@@ -42,6 +41,23 @@ const Board = () => {
     await fileSystem.saveFile(fileContents);
   };
 
+  /**
+   * Setup Tauri event handlers on mount
+   */
+  useEffect(() => {
+    if (isNativeApp()) {
+      appWindow.listen("tauri://menu", ({ windowLabel, payload }) => {
+        switch (payload) {
+          case "open":
+            handleOpenProject();
+            break;
+          case "save":
+            handleSaveProject();
+        }
+      });
+    }
+  }, []);
+
   return (
     <main>
       <Tldraw
@@ -53,6 +69,7 @@ const Board = () => {
         onNewProject={handleNewProject}
         onOpenProject={handleOpenProject}
         onSaveProject={handleSaveProject}
+        showMenu={!isNativeApp()}
         {...session?.eventHandlers}
       />
     </main>
