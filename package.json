@@ -15,17 +15,24 @@
     "url": "https://github.com/interalia-studio/fullscreen/issues"
   },
   "scripts": {
-    "start": "parcel",
+    "start": "parcel --https",
     "build:web": "parcel build"
   },
   "dependencies": {
+    "@tldraw/tldraw": "^1.10.0",
+    "@y-presence/client": "^1.1.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-router-dom": "^6.3.0",
+    "uuid": "^8.3.2",
+    "yjs": "^13.5.35"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
-    "parcel": "^2.3.2"
+    "buffer": "^6.0.3",
+    "parcel": "^2.3.2",
+    "process": "^0.11.10"
   },
   "browserslist": "> 0.5%, last 2 versions, not dead"
 }
