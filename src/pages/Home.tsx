@@ -9,7 +9,7 @@ import logoOKFN from "../assets/images/logo-okfn.svg";
 
 const Home = () => {
   // Redirects to a random board when opening the native app
-  if (isNativeApp) {
+  if (isNativeApp()) {
     return <Navigate replace to={`/board/${uuid()}`} />;
   }
 
