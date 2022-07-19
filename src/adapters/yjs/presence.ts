@@ -13,12 +13,16 @@ export default class Presence {
   room: Room;
   _handleDisconnect: Function;
 
-  constructor(websocketProvider: WebsocketProvider) {
-    this.room = new Room(websocketProvider.awareness);
+  constructor(websocketProvider: WebsocketProvider, app: TldrawApp) {
+    const initialPresence: TldrawPresence = {
+      id: app.room.userId,
+      tdUser: app.room.users[app.room.userId],
+    };
+    this.room = new Room(websocketProvider.awareness, initialPresence);
   }
 
   connect(app: TldrawApp) {
-    this._handleDisconnect = this.room.subscribe<TldrawPresence>(
+    this._handleDisconnect = this.room.subscribe(
       "others",
       throttle((users: any) => {
         if (!app.room) return;
@@ -59,6 +63,6 @@ export default class Presence {
 
   update = (id: string, tdUser: TDUser) => {
     if (!this.room) return;
-    this.room.setPresence<TldrawPresence>({ id, tdUser });
+    this.room.setPresence({ id, tdUser });
   };
 }

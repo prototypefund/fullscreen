@@ -36,7 +36,11 @@ export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
     [boardId]
   );
 
-  const room = useMemo(() => new Presence(networkProvider), [networkProvider]);
+  const room = useMemo(() => {
+    // Don't initialise room if app is not ready.
+    if (!app) return;
+    return new Presence(networkProvider, app);
+  }, [networkProvider, app]);
 
   /**
    * Replaces the full Tldraw document with shapes and bindings from y.js.
@@ -160,7 +164,7 @@ export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
 
       onChangePresence: useCallback(
         (app: TldrawApp, user: TDUser) =>
-          app && room.update(app.room.userId, user),
+          app && room && room.update(app.room.userId, user),
         [room]
       ),
     },
