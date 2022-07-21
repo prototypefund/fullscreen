@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refuse loading document without a board id [#37](https://github.com/interalia-studio/fullscreen/pull/37)
 - Throttle presence updates [#35](https://github.com/interalia-studio/fullscreen/pull/35)
 - Fix CI cache [#60](https://github.com/interalia-studio/fullscreen/pull/60)
+- Fixed landing page rendering [#59](https://github.com/interalia-studio/fullscreen/pull/59)
 
 ### Bits and bobs
 
