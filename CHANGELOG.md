@@ -9,12 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Tauri configuration for building Fullscreen as a native app [#28](https://github.com/interalia-studio/fullscreen/pull/28)
 - Custom toolbar with Fullscreen tools [#56](https://github.com/interalia-studio/fullscreen/pull/56)
 - Use stitches for CSS-in-JS [#56](https://github.com/interalia-studio/fullscreen/pull/56)
 
 ### Fixed
 
-- Fix release action running on every push to `main` branch [#56](https://github.com/interalia-studio/fullscreen/pull/56)
+- Fixed release action running on every push to `main` branch [#56](https://github.com/interalia-studio/fullscreen/pull/56)
+- Fixed redirect to correct document URL in file load [#32](https://github.com/interalia-studio/fullscreen/pull/32)
+- Refuse loading document without a board id [#37](https://github.com/interalia-studio/fullscreen/pull/37)
+- Throttle presence updates [#35](https://github.com/interalia-studio/fullscreen/pull/35)
+
+### Bits and bobs
+
+- Added a changelog [#33](https://github.com/interalia-studio/fullscreen/pull/33)
 
 ## [0.1.0]
 
