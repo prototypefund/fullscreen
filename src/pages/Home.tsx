@@ -2,11 +2,11 @@ import React, { useMemo } from "react";
 import { v4 as uuid } from "uuid";
 import { Navigate } from "react-router-dom";
 
+import { styled } from "../styles";
 import { isNativeApp } from "../lib/tauri";
 
 import LogoBMBF from "../assets/images/logo-bmbf.svg";
 import LogoOKFN from "../assets/images/logo-okfn.svg";
-import styled from "../stitches.config";
 
 export const Home = () => {
   // Redirects to a random board when opening the native app
@@ -40,7 +40,7 @@ const Heading = styled("h1", {
   marginBottom: "3em",
   maxWidth: "15em",
   textAlign: "center",
-  fontFamily: "$body",
+  fontFamily: "$text",
   fontSize: "3em",
   color: "$blue",
   wordBreak: "keep-all",
@@ -49,7 +49,7 @@ const Heading = styled("h1", {
   },
 });
 
-const Logos = styled("div", {
+const Logos = styled("section", {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
