@@ -7,7 +7,8 @@ import * as Y from "yjs";
 import { FileProvider } from "./fileProvider";
 import Presence from "./presence";
 import store from "./store";
-import { FSAdapter } from "~/types";
+import { BoardId, BoardMeta, FSAdapter, FSUser, UserId } from "~/types";
+import { getUserId } from "./identity";
 
 /**
  * A `YjsSession` uses a Websocket connection to a relay server to sync document
@@ -15,9 +16,19 @@ import { FSAdapter } from "~/types";
  *
  * It can serialise and deserialise to a binary format.
  */
-export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
+export const useYjsSession = (
+  app: TldrawApp,
+  passive: boolean,
+  boardId: BoardId
+): FSAdapter => {
   // This is false until the page state has been loaded from yjs
   const [isLoading, setLoading] = useState(true);
+
+  // Fullscreen-scoped user.
+  const [fsUser, _] = useState<FSUser>({ id: getUserId() });
+
+  // Board metadata synced to y.js
+  const [boardMeta, setBoardMeta] = useState<BoardMeta>(null);
 
   // @TODO: Connect file provider to file handle after saving from a browser that
   // implements the Filesystem Access API in order to auto-save.
@@ -49,6 +60,17 @@ export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
     const shapes = Object.fromEntries(store.yShapes.entries());
     const bindings = Object.fromEntries(store.yBindings.entries());
     app.replacePageContent(shapes, bindings, {});
+  };
+
+  /**
+   * Update board metadata state from y.js
+   */
+  const updateBoardMeta = () => {
+    setBoardMeta({
+      id: store.board.get("id"),
+      createdBy: store.board.get("createdBy"),
+      createdOn: new Date(store.board.get("createdOn")),
+    });
   };
 
   /**
@@ -90,7 +112,9 @@ export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
     room.connect(app);
 
     async function setup() {
+      store.board.observe(updateBoardMeta);
       store.yShapes.observeDeep(replacePageWithDocState);
+      updateBoardMeta;
       replacePageWithDocState();
       setLoading(false);
     }
@@ -113,13 +137,19 @@ export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
    * Create a new board and return its id.
    */
   const createDocument = (): string => {
+    // Create a new document instance.
     store.reset(null);
+
+    // Set metadata.
     const newBoardId = uuid();
     // Prevent undoing initial set of the board id
     store.undoManager.stopCapturing();
     store.doc.transact(() => {
       store.board.set("id", newBoardId);
+      store.board.set("createdBy", fsUser.id);
+      store.board.set("createdOn", new Date().toUTCString());
     });
+
     return newBoardId;
   };
 
@@ -133,12 +163,35 @@ export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
     if (networkProvider) networkProvider.disconnect();
     replacePageWithDocState();
     setLoading(false);
+
+    // Validate that board has all metadata
+    // TODO: Remove this once yjs.fullscreen.space doesn't contain documents without `boardId`.
     const boardId = store.board.get("id");
-    if (boardId == null) {
-      alert("Outdated document doesn't contain a board id");
+    const creator = store.board.get("createdBy");
+    const createdOn = store.board.get("createdOn");
+    if (boardId == null || creator == null || createdOn == null) {
+      alert("Outdated document doesn't contain required metadata");
       return createDocument();
     }
     return boardId;
+  };
+
+  /**
+   * Creeate and join a copy of the current board that can be edited independently.
+   *
+   * Disconnects the network provider and changes the board's `id`. When the network provider
+   * reconnects it will send changes to a new room because the id has changed.
+   *
+   * @returns the newly created boardId
+   */
+  const createDuplicate = (): BoardId => {
+    if (networkProvider) networkProvider.disconnect();
+    store.undoManager.stopCapturing();
+    const newBoardId = uuid();
+    store.board.set("id", newBoardId);
+    store.board.set("createdBy", fsUser.id);
+    store.board.set("createdOn", new Date().toUTCString());
+    return newBoardId;
   };
 
   /**
@@ -150,7 +203,14 @@ export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
     isLoading,
     createDocument,
     loadDocument,
+    createDuplicate,
     serialiseDocument,
+    board: {
+      id: boardId,
+      createdBy: boardMeta?.createdBy,
+      createdOn: boardMeta?.createdOn,
+    },
+    user: fsUser,
     eventHandlers: {
       onChangePage: handleChangePage,
 
@@ -164,7 +224,7 @@ export const useYjsSession = (app: TldrawApp, boardId: string): FSAdapter => {
 
       onChangePresence: useCallback(
         (app: TldrawApp, user: TDUser) =>
-          app && room && room.update(app.room.userId, user),
+          app && !passive && room && room.update(app.room.userId, user),
         [room]
       ),
     },

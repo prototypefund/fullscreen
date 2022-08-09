@@ -8,11 +8,18 @@ import fileSystem from "~/lib/fileSystem";
 import { isNativeApp } from "~/lib/tauri";
 import { Toolbar } from "~/components/Toolbar";
 import { AppContext } from "~/components/Canvas";
+import { JoinBoard } from "../JoinBoard";
 
 export const Canvas = ({ boardId }: { boardId: string }) => {
   let navigate = useNavigate();
 
   const [tldrawApp, setTLDrawApp] = useState<TldrawApp>();
+
+  // True when user has given consent to broadcast their changes and presence.
+  const [collaborationConsent, setCollaborationConsent] = useState<boolean>(
+    isNativeApp()
+  );
+
   const handleMount = useCallback(
     (tldraw: TldrawApp) => {
       tldraw.loadRoom(boardId);
@@ -22,7 +29,7 @@ export const Canvas = ({ boardId }: { boardId: string }) => {
     [boardId]
   );
 
-  const session = useYjsSession(tldrawApp, boardId);
+  const session = useYjsSession(tldrawApp, !collaborationConsent, boardId);
 
   const handleNewProject = () => {
     const newBoardId = session.createDocument();
@@ -57,24 +64,45 @@ export const Canvas = ({ boardId }: { boardId: string }) => {
     }
   }, []);
 
+  const openDuplicate = async () => {
+    const newBoardId = session.createDuplicate(boardId);
+    navigate(`/board/${newBoardId}`);
+  };
+
+  // Show the join dialogue once the session is loaded, if current user is not the board
+  // author and has not already given consent to join.
+  const displayJoinDialogue =
+    !session.isLoading &&
+    session.board?.createdBy != null &&
+    session.board.createdBy !== session.user.id &&
+    !collaborationConsent;
+
   return (
     <div className="tldraw">
       <Tldraw
         disableAssets
         showPages={false}
         showMultiplayerMenu={false}
-        readOnly={session?.isLoading}
+        readOnly={session?.isLoading || !collaborationConsent}
         onMount={handleMount}
         onNewProject={handleNewProject}
         onOpenProject={handleOpenProject}
         onSaveProject={handleSaveProject}
         showMenu={!isNativeApp()}
+        // Disable TLDraw's own toolbar.
         showTools={false}
         {...session?.eventHandlers}
       />
       {tldrawApp && (
         <AppContext.Provider value={tldrawApp}>
           <Toolbar />
+
+          {displayJoinDialogue && (
+            <JoinBoard
+              onJoin={() => setCollaborationConsent(true)}
+              onCopyBoard={openDuplicate}
+            />
+          )}
         </AppContext.Provider>
       )}
     </div>
