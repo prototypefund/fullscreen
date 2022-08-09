@@ -12,9 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tauri configuration for building Fullscreen as a native app [#28](https://github.com/interalia-studio/fullscreen/pull/28)
 - Custom toolbar with Fullscreen tools [#56](https://github.com/interalia-studio/fullscreen/pull/56)
 - Use stitches for CSS-in-JS [#56](https://github.com/interalia-studio/fullscreen/pull/56)
-- Added self-hosted Urbanist web font [#59](https://github.com/interalia-studio/fullscreen/pull/59)
-- Added more tools to the new toolbar [#61](https://github.com/interalia-studio/fullscreen/pull/61)
-- Added Typescript config [#64](https://github.com/interalia-studio/fullscreen/pull/64)
+- Self-hosted Urbanist web font [#59](https://github.com/interalia-studio/fullscreen/pull/59)
+- More tools for the new toolbar [#61](https://github.com/interalia-studio/fullscreen/pull/61)
 
 ### Changed
 
@@ -32,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Bits and bobs
 
 - Added a changelog [#33](https://github.com/interalia-studio/fullscreen/pull/33)
+- Typescript config [#64](https://github.com/interalia-studio/fullscreen/pull/64)
 
 ## [0.1.0]
 
