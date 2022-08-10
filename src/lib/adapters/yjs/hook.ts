@@ -8,7 +8,14 @@ import debug from "debug";
 import { FileProvider } from "./fileProvider";
 import YPresence from "./presence";
 import store from "./store";
-import { BoardContents, BoardId, BoardMeta, FSAdapter, FSUser } from "~/types";
+import {
+  BoardContents,
+  BoardId,
+  BoardMeta,
+  FSAdapter,
+  FSUser,
+  BoardStatus,
+} from "~/types";
 import { getUserId } from "./identity";
 
 const log = debug("fs:yjs");
@@ -26,9 +33,11 @@ export const useYjsAdapter = (boardId: BoardId): FSAdapter => {
   // Fullscreen-scoped user.
   const [fsUser, _] = useState<FSUser>({ id: getUserId() });
 
-  // Board metadata synced to y.js
-  const [boardMeta, setBoardMeta] = useState<BoardMeta>(null);
+  // Availability of the board in the store.
+  const [boardStatus, setBoardStatus] = useState(BoardStatus.NotFound);
 
+  // Board data synced to y.js
+  const [boardMeta, setBoardMeta] = useState<BoardMeta>();
   const [boardContents, setBoardContents] = useState({} as BoardContents);
 
   // When set, don't broadcast changes and presence.
@@ -69,11 +78,23 @@ export const useYjsAdapter = (boardId: BoardId): FSAdapter => {
    * Update board metadata state from y.js
    */
   const updateBoardMeta = () => {
-    setBoardMeta({
-      id: store.board.get("id"),
+    const id = store.board.get("id");
+
+    // As we can't distinguish a non-existing board from a board with no changes
+    // we use the board id meta attribute as a proxy. If a board is loaded that does
+    // not exist in the WebsocketProvider, the y.js board id will not be available.
+    // Here, the board status is set to ok only if the board id that is expected locally
+    // matches what can be loaded from the store.
+    if (id === boardId) {
+      setBoardStatus(BoardStatus.Ok);
+    }
+
+    setBoardMeta((prev) => ({
+      ...prev,
+      id,
       createdBy: store.board.get("createdBy"),
       createdOn: new Date(store.board.get("createdOn")),
-    });
+    }));
   };
 
   /**
@@ -115,12 +136,13 @@ export const useYjsAdapter = (boardId: BoardId): FSAdapter => {
     async function setup() {
       store.board.observe(updateBoardMeta);
       store.yShapes.observeDeep(updateBoardContentsFromYjs);
-      updateBoardMeta;
+      updateBoardMeta();
       updateBoardContentsFromYjs();
       setLoading(false);
     }
 
     const tearDown = () => {
+      store.board.unobserve(updateBoardMeta);
       store.yShapes.unobserveDeep(updateBoardContentsFromYjs);
       if (networkProvider) networkProvider.disconnect();
     };
@@ -225,11 +247,8 @@ export const useYjsAdapter = (boardId: BoardId): FSAdapter => {
     updatePresence,
 
     contents: boardContents,
-    meta: {
-      id: boardMeta?.id,
-      createdBy: boardMeta?.createdBy,
-      createdOn: boardMeta?.createdOn,
-    },
+    meta: boardMeta,
+    status: boardStatus,
 
     eventHandlers: {
       onChangePage: handleChangePage,
