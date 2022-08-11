@@ -22,13 +22,15 @@ export const JoinBoard = () => {
     store.meta.createdBy !== store.user.id &&
     !store.collaborationConsent;
 
+  const createdDateStr = store.meta?.createdOn.toLocaleDateString("en-us");
+
   return (
     showDialogue && (
       <Dialogue
         header={
           <>
-            <h1>Fullscreen Sprint 3</h1>
-            <h2>Created by Rae on April 24, 2022</h2>
+            <h1>Untitled Document</h1>
+            <h2>Created on {createdDateStr}</h2>
           </>
         }
         actions={
