@@ -1,5 +1,4 @@
 import { TDBinding, TDShape, TDUser, TldrawApp } from "@tldraw/tldraw";
-import { v4 as uuid } from "uuid";
 import { useCallback, useEffect, useState, useMemo, useContext } from "react";
 import * as Y from "yjs";
 
@@ -17,6 +16,7 @@ import {
 import { getUserId } from "./identity";
 import { useIndexedDbProvider, useWebsocketProvider } from "./providers";
 import { isNativeApp } from "~/lib/tauri";
+import { useDocumentHandlers } from "./document";
 
 /**
  * A `useYjsAdapter` uses a Websocket connection to a relay server to sync document
@@ -46,8 +46,9 @@ export const useYjsAdapter = (boardId: BoardId): FSAdapter => {
   const localProvider = useMemo(() => new FileProvider(store.doc), [boardId]);
 
   const websocketProvider = useWebsocketProvider(boardId);
-  const presence = usePresence(websocketProvider);
-  const indexedDbProvider = useIndexedDbProvider(boardId);
+  useIndexedDbProvider(boardId);
+
+  const presence = usePresence(websocketProvider, passiveMode, fsUser);
 
   const updateBoardContentsFromYjs = () => {
     const shapes = Object.fromEntries(store.yShapes.entries());
@@ -140,80 +141,10 @@ export const useYjsAdapter = (boardId: BoardId): FSAdapter => {
     };
   }, [boardId]);
 
-  /**
-   * Create a new board and return its id.
-   */
-  const createDocument = (): BoardId => {
-    // Create a new document instance.
-    store.reset(null);
-
-    // Set metadata.
-    const newBoardId = uuid();
-    // Prevent undoing initial set of the board id
-    store.undoManager.stopCapturing();
-    store.doc.transact(() => {
-      store.board.set("id", newBoardId);
-      store.board.set("createdBy", fsUser.id);
-      store.board.set("createdOn", new Date().toUTCString());
-    });
-
-    return newBoardId;
-  };
-
-  /**
-   * Load a binary representation of a document.
-   */
-  const loadDocument = (serialisedDocument: Uint8Array): BoardId => {
-    setLoading(true);
-    store.reset(serialisedDocument);
-    if (websocketProvider) websocketProvider.disconnect();
-    updateBoardContentsFromYjs();
-    setLoading(false);
-
-    // Validate that board has all metadata
-    // TODO: Remove this once yjs.fullscreen.space doesn't contain documents without `boardId`.
-    const boardId = store.board.get("id");
-    const creator = store.board.get("createdBy");
-    const createdOn = store.board.get("createdOn");
-    if (boardId == null || creator == null || createdOn == null) {
-      alert("Outdated document doesn't contain required metadata");
-      return createDocument();
-    }
-
-    return boardId;
-  };
-
-  /**
-   * Create and join a copy of the current board that can be edited independently.
-   *
-   * Disconnects the network provider and changes the board's `id`. When the network provider
-   * reconnects it will send changes to a new Y.js room because the id has changed.
-   *
-   * @returns the newly created boardId
-   */
-  const createDuplicate = (): BoardId => {
-    if (websocketProvider) websocketProvider.disconnect();
-    store.undoManager.stopCapturing();
-    const newBoardId = uuid();
-    store.board.set("id", newBoardId);
-    store.board.set("createdBy", fsUser.id);
-    store.board.set("createdOn", new Date().toUTCString());
-    return newBoardId;
-  };
-
-  /**
-   * Returns a binary representation of the y.js document.
-   */
-  const serialiseDocument = (): Uint8Array => Y.encodeStateAsUpdate(store.doc);
-
-  /**
-   * Broadcasts presence information unless store is in passive mode.
-   */
-  const updatePresence = useCallback(
-    (userPresence: TDUser) => {
-      if (!passiveMode && presence) presence.update(fsUser.id, userPresence);
-    },
-    [passiveMode, presence, fsUser]
+  const documentHandlers = useDocumentHandlers(
+    fsUser,
+    websocketProvider,
+    updateBoardContentsFromYjs
   );
 
   return {
@@ -221,14 +152,10 @@ export const useYjsAdapter = (boardId: BoardId): FSAdapter => {
     passiveMode,
     setPassiveMode,
 
-    createDocument,
-    loadDocument,
-    createDuplicate,
-    serialiseDocument,
+    document: documentHandlers,
 
     user: fsUser,
-    presence: presence,
-    updatePresence,
+    presence,
 
     contents: boardContents,
     meta: boardMeta,
