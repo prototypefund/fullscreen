@@ -46,10 +46,19 @@ export const Store: React.FC<{
             break;
           case "save":
             handleSaveProject();
+            break;
+          case "link":
+            handleCreateLink();
         }
       });
     }
   }, []);
+
+  const handleCreateLink = useCallback(() => {
+    const link =  window.location.host + '/board/' + props.boardId;
+    setCollaborationConsent(true)
+    navigator.clipboard.writeText(link);
+  }, [adapter, navigate]);
 
   const handleNewProject = useCallback(() => {
     const newBoardId = adapter.document.create();

@@ -6,14 +6,16 @@
 use tauri::{CustomMenuItem, Menu, Submenu, WindowMenuEvent};
 
 fn create_application_menu() -> Menu {
-    Menu::new().add_submenu(Submenu::new(
+    let submenu = Submenu::new(
         "File",
         Menu::with_items([
             CustomMenuItem::new("open".to_string(), "Open...").into(),
             CustomMenuItem::new("save".to_string(), "Save as...").into(),
+            CustomMenuItem::new("link".to_string(), "Share link...").into(),
             CustomMenuItem::new("quit".to_string(), "Quit").into(),
         ]),
-    ))
+    );
+    Menu::new().add_submenu(submenu)
 }
 
 fn handle_menu_event(event: WindowMenuEvent) {
