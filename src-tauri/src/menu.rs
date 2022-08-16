@@ -1,4 +1,13 @@
-use tauri::{AboutMetadata, CustomMenuItem, Menu, MenuItem, Submenu};
+use tauri::{AboutMetadata, CustomMenuItem, Menu, MenuItem, Submenu, WindowMenuEvent};
+
+pub fn handle_menu_event(event: WindowMenuEvent) {
+    match event.menu_item_id() {
+        "quit" => {
+            std::process::exit(0);
+        }
+        _ => {}
+    }
+}
 
 /**
  * Use `MenuBuilder` to setup the main application menu.

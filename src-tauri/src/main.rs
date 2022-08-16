@@ -4,7 +4,7 @@
 )]
 mod menu;
 
-use menu::MenuBuilder;
+use menu::{handle_menu_event, MenuBuilder};
 
 fn main() {
     let context = tauri::generate_context!();
@@ -19,6 +19,7 @@ fn main() {
 
     tauri::Builder::default()
         .menu(menu)
+        .on_menu_event(handle_menu_event)
         .run(context)
         .expect("error while running tauri application");
 }
