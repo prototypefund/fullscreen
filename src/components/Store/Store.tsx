@@ -55,7 +55,7 @@ export const Store: React.FC<{
   }, []);
 
   const handleCreateLink = useCallback(() => {
-    const link =  window.location.host + '/board/' + props.boardId;
+    const link =  window.location.host + '/board/' + context.boardId
     setCollaborationConsent(true)
     navigator.clipboard.writeText(link);
   }, [adapter, navigate]);
