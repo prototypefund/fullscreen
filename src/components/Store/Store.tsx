@@ -41,6 +41,9 @@ export const Store: React.FC<{
     if (isNativeApp()) {
       appWindow.listen("tauri://menu", ({ payload }) => {
         switch (payload) {
+          case "new":
+            handleNewProject();
+            break;
           case "open":
             handleOpenProject();
             break;
@@ -55,8 +58,9 @@ export const Store: React.FC<{
   }, []);
 
   const handleCreateLink = useCallback(() => {
-    const link =  window.location.host + '/board/' + context.boardId
-    setCollaborationConsent(true)
+    const link = window.location.host + "/board/" + context.boardId;
+    // TODO: Remove before merging
+    setCollaborationConsent(true);
     navigator.clipboard.writeText(link);
   }, [adapter, navigate]);
 

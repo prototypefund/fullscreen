@@ -3,43 +3,111 @@
     windows_subsystem = "windows"
 )]
 
-use tauri::{CustomMenuItem, Menu, Submenu, WindowMenuEvent};
+use tauri::{AboutMetadata, CustomMenuItem, Menu, MenuItem, Submenu};
 
-fn create_application_menu() -> Menu {
+struct MenuBuilder(tauri::Menu);
 
-    let top_level = Submenu::new(
-        "Fullscreen",
-        Menu::new()
-            .add_item(CustomMenuItem::new("preferences".to_string(), "Preferences").into())
-            .add_item(CustomMenuItem::new("about".to_string(), "About").into())
-            .add_item(CustomMenuItem::new("quit".to_string(), "Quit").into())
-    );
-    let file_menu= Submenu::new(
-        "File",
-        Menu::new()
-            .add_item(CustomMenuItem::new("open".to_string(), "Open...").into())
-            .add_item(CustomMenuItem::new("save".to_string(), "Save as...").into())
-            .add_item(CustomMenuItem::new("link".to_string(), "Share link...").into())
-    );
+impl MenuBuilder {
+    pub fn new() -> Self {
+        Self(Menu::new())
+    }
 
-    Menu::new()
-        .add_submenu(top_level)
-        .add_submenu(file_menu)
-}
+    pub fn add_application_menu(mut self, application_name: &str) -> Self {
+        let app_menu = Menu::new()
+            .add_native_item(MenuItem::About(
+                application_name.to_string(),
+                AboutMetadata::default(),
+            ))
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::Services)
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::Hide)
+            .add_native_item(MenuItem::HideOthers)
+            .add_native_item(MenuItem::ShowAll)
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::Quit);
+        self.0 = self.0.add_submenu(Submenu::new(application_name, app_menu));
+        self
+    }
 
-fn handle_menu_event(event: WindowMenuEvent) {
-    match event.menu_item_id() {
-        "quit" => {
-            std::process::exit(0);
-        }
-        _ => {}
+    pub fn add_file_menu(mut self) -> Self {
+        let file_menu = Menu::new()
+            .add_item(
+                CustomMenuItem::new("new".to_string(), "New")
+                    .accelerator("CommandOrControl+N")
+                    .into(),
+            )
+            .add_item(
+                CustomMenuItem::new("open".to_string(), "Open...")
+                    .accelerator("CommandOrControl+O")
+                    .into(),
+            )
+            .add_item(
+                CustomMenuItem::new("save".to_string(), "Save as...")
+                    .accelerator("CommandOrControl+S")
+                    .into(),
+            )
+            .add_item(
+                CustomMenuItem::new("link".to_string(), "Share link...")
+                    .accelerator("CommandOrControl+L")
+                    .into(),
+            )
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::CloseWindow);
+        self.0 = self.0.add_submenu(Submenu::new("File", file_menu));
+        self
+    }
+
+    pub fn add_edit_menu(mut self) -> Self {
+        let edit_menu = Menu::new()
+            .add_native_item(MenuItem::Undo)
+            .add_native_item(MenuItem::Redo)
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::Cut)
+            .add_native_item(MenuItem::Copy)
+            .add_native_item(MenuItem::Paste)
+            .add_native_item(MenuItem::SelectAll);
+
+        self.0 = self.0.add_submenu(Submenu::new("Edit", edit_menu));
+        self
+    }
+
+    pub fn add_window_menu(mut self) -> Self {
+        let window_menu = Menu::new()
+            .add_native_item(MenuItem::Minimize)
+            .add_native_item(MenuItem::Zoom)
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::CloseWindow);
+
+        self.0 = self.0.add_submenu(Submenu::new("Window", window_menu));
+        self
+    }
+
+    pub fn add_view_menu(mut self) -> Self {
+        let view_menu = Menu::new().add_native_item(MenuItem::EnterFullScreen);
+
+        self.0 = self.0.add_submenu(Submenu::new("View", view_menu));
+        self
+    }
+
+    pub fn build(&self) -> Menu {
+        self.0.clone()
     }
 }
 
 fn main() {
+    let context = tauri::generate_context!();
+
+    let menu = MenuBuilder::new()
+        .add_application_menu(&context.package_info().name)
+        .add_file_menu()
+        .add_edit_menu()
+        .add_view_menu()
+        .add_window_menu()
+        .build();
+
     tauri::Builder::default()
-        .menu(create_application_menu())
-        .on_menu_event(handle_menu_event)
-        .run(tauri::generate_context!())
+        .menu(menu)
+        .run(context)
         .expect("error while running tauri application");
 }
