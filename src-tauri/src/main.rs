@@ -5,6 +5,13 @@
 
 use tauri::{AboutMetadata, CustomMenuItem, Menu, MenuItem, Submenu};
 
+/**
+ * Use `MenuBuilder` to setup the main application menu.
+ *
+ * Tauri has a method for creating OS-specific default menus but they can not be edited, therefore
+ * all default menus are created manually here.
+ * C.f. https://github.com/tauri-apps/tauri/issues/4945
+ */
 struct MenuBuilder(tauri::Menu);
 
 impl MenuBuilder {
