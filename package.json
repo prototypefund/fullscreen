@@ -21,7 +21,7 @@
     "tauri:dev": "tauri dev",
     "build": "run-s build:web build:tauri",
     "build:web": "parcel build",
-    "build:tauri": "tauri build",
+    "build:tauri": "tauri build --target universal-apple-darwin",
     "check": "tsc --noEmit"
   },
   "dependencies": {
