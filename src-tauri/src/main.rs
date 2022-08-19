@@ -6,16 +6,25 @@
 use tauri::{CustomMenuItem, Menu, Submenu, WindowMenuEvent};
 
 fn create_application_menu() -> Menu {
-    let submenu = Submenu::new(
-        "File",
-        Menu::with_items([
-            CustomMenuItem::new("open".to_string(), "Open...").into(),
-            CustomMenuItem::new("save".to_string(), "Save as...").into(),
-            CustomMenuItem::new("link".to_string(), "Share link...").into(),
-            CustomMenuItem::new("quit".to_string(), "Quit").into(),
-        ]),
+
+    let top_level = Submenu::new(
+        "Fullscreen",
+        Menu::new()
+            .add_item(CustomMenuItem::new("preferences".to_string(), "Preferences").into())
+            .add_item(CustomMenuItem::new("about".to_string(), "About").into())
+            .add_item(CustomMenuItem::new("quit".to_string(), "Quit").into())
     );
-    Menu::new().add_submenu(submenu)
+    let file_menu= Submenu::new(
+        "File",
+        Menu::new()
+            .add_item(CustomMenuItem::new("open".to_string(), "Open...").into())
+            .add_item(CustomMenuItem::new("save".to_string(), "Save as...").into())
+            .add_item(CustomMenuItem::new("link".to_string(), "Share link...").into())
+    );
+
+    Menu::new()
+        .add_submenu(top_level)
+        .add_submenu(file_menu)
 }
 
 fn handle_menu_event(event: WindowMenuEvent) {
