@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add menu items [#84](https://github.com/interalia-studio/fullscreen/pull/84)
 - Tauri configuration for building Fullscreen as a native app [#28](https://github.com/interalia-studio/fullscreen/pull/28)
 - Custom toolbar with Fullscreen tools [#56](https://github.com/interalia-studio/fullscreen/pull/56)
 - Use stitches for CSS-in-JS [#56](https://github.com/interalia-studio/fullscreen/pull/56)
