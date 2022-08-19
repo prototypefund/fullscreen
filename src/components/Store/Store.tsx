@@ -54,7 +54,8 @@ export const Store: React.FC<{
             handleSaveProject();
             break;
           case "link":
-            const link = window.location.host + "/board/" + props.boardId;
+            // TODO: link to localhost while in dev mode
+            const link = "https://fullscreen.space/board/" + props.boardId;
             navigator.clipboard.writeText(link);
             break;
         }
