@@ -38,8 +38,10 @@ export const Store: React.FC<{
    * Setup Tauri event handlers on mount
    */
   useEffect(() => {
-    if (isNativeApp()) {
-      appWindow.listen("tauri://menu", ({ payload }) => {
+    let destroyFn 
+
+    async function setupListener () {
+      destroyFn = await appWindow.listen("tauri://menu", ({ payload }) => {
         switch (payload) {
           case "new":
             handleNewProject();
@@ -51,18 +53,19 @@ export const Store: React.FC<{
             handleSaveProject();
             break;
           case "link":
-            handleCreateLink();
+            const link = window.location.host + "/board/" + props.boardId;
+            navigator.clipboard.writeText(link);
+            break;
         }
       });
     }
-  }, []);
 
-  const handleCreateLink = useCallback(() => {
-    const link = window.location.host + "/board/" + context.boardId;
-    // TODO: Remove before merging
-    setCollaborationConsent(true);
-    navigator.clipboard.writeText(link);
-  }, [adapter, navigate]);
+    if (isNativeApp()) setupListener()
+      
+    return () => {
+       if (destroyFn) destroyFn()
+    }
+  }, [props.boardId]);
 
   const handleNewProject = useCallback(() => {
     const newBoardId = adapter.document.create();
