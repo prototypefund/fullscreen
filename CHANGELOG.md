@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add menu items [#84](https://github.com/interalia-studio/fullscreen/pull/84)
 - Tauri configuration for building Fullscreen as a native app [#28](https://github.com/interalia-studio/fullscreen/pull/28)
 - Custom toolbar with Fullscreen tools [#56](https://github.com/interalia-studio/fullscreen/pull/56)
 - Use stitches for CSS-in-JS [#56](https://github.com/interalia-studio/fullscreen/pull/56)
@@ -21,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Menu bar for web app [#71](https://github.com/interalia-studio/fullscreen/pull/71)
 - Offline mode using IndexedDB [#72](https://github.com/interalia-studio/fullscreen/pull/72)
 - Native app icon [#86](https://github.com/interalia-studio/fullscreen/pull/86)
+- Add menu items [#84](https://github.com/interalia-studio/fullscreen/pull/84)
 
 ### Changed
 
@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix CI cache [#60](https://github.com/interalia-studio/fullscreen/pull/60)
 - Fixed landing page rendering [#59](https://github.com/interalia-studio/fullscreen/pull/59)
 - Always broadcast presence when board creator [#74](https://github.com/interalia-studio/fullscreen/pull/74)
+- Fix URL schema for sharing link [no PR](https://github.com/interalia-studio/fullscreen/commit/f1789adfa733ff6ab3cd8820f8b8fa191c14de87)
 
 ### Bits and bobs
 
