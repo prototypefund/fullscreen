@@ -18,9 +18,10 @@ export default {
     binary: Uint8Array,
     filePath?: string,
   ) => {
+    let path
     if (isNativeApp()) {
       if (!filePath) {
-        filePath = await dialog.save({
+        path = await dialog.save({
           filters: [
             {
               name: "Fullscreen Board",
@@ -28,12 +29,14 @@ export default {
             },
           ],
         });
+      } else {
+        path = filePath
       }
       await fs.writeBinaryFile({
         contents: binary,
-        path: filePath,
+        path,
       });
-      return filePath;
+      return path;
     }
 
     if ("showSaveFilePicker" in window) {
