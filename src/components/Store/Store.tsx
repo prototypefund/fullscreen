@@ -18,6 +18,7 @@ export const Store: React.FC<{
   children: React.ReactNode;
 }> = (props) => {
   const navigate = useNavigate();
+  const [filePath, setFilePath] = useState(null);
   const adapter = useYjsAdapter(props.boardId);
 
   // True when user has given consent to broadcast their changes and presence.
@@ -69,18 +70,24 @@ export const Store: React.FC<{
 
   const handleNewProject = useCallback(() => {
     const newBoardId = adapter.document.create();
+    setFilePath(null)
     navigate(`/board/${newBoardId}`);
   }, [adapter, navigate]);
 
   const handleOpenProject = useCallback(async () => {
-    const fileContents = await fileSystem.openFile();
-    const newBoardId = adapter.document.load(fileContents);
+    const {filePath, contents} = await fileSystem.openFile();
+    setFilePath(filePath)
+    const newBoardId = adapter.document.load(contents, filePath);
     navigate(`/board/${newBoardId}`);
   }, [adapter]);
 
   const handleSaveProject = useCallback(async () => {
     const fileContents = adapter.document.serialise();
-    await fileSystem.saveFile(fileContents);
+    const maybeNewFilePath = await fileSystem.saveFile(fileContents, filePath);
+    if (maybeNewFilePath) {
+      console.log("filepath", maybeNewFilePath)
+      setFilePath(maybeNewFilePath)
+    }
   }, [adapter]);
 
   // Store context extends the adapter with functionality that is independent

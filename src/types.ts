@@ -60,7 +60,7 @@ export interface FSDocumentHandlers {
   /**
    * Load a binary representation of a document and subscribe to changes.
    */
-  load: (input: Uint8Array) => BoardId;
+  load: (input: Uint8Array, filePath?: string) => BoardId;
 
   /**
    * Serialise the current board state.
@@ -76,6 +76,7 @@ export interface FSDocumentHandlers {
    * True while a document is being loaded.
    */
   isLoading: boolean;
+
 }
 
 export interface FSAdapter {
