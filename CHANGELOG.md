@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0]
+
 ### Added
 
 - Tauri configuration for building Fullscreen as a native app [#28](https://github.com/interalia-studio/fullscreen/pull/28)
@@ -22,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Native app icon [#86](https://github.com/interalia-studio/fullscreen/pull/86)
 - Add menu items [#84](https://github.com/interalia-studio/fullscreen/pull/84)
 - License Fullscreen under AGPLv3 [#93](https://github.com/interalia-studio/fullscreen/pull/93)
+- Show dialogue when opening board in the native app [#94](https://github.com/interalia-studio/fullscreen/pull/94)
+
 
 ### Changed
 
