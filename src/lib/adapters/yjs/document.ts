@@ -54,7 +54,7 @@ export const useDocumentHandlers = (
   /**
    * Load a binary representation of a document.
    */
-  const load = (serialisedDocument: Uint8Array): BoardId => {
+  const load = (serialisedDocument: Uint8Array, filePath?: string): BoardId => {
     setLoading(true);
     store.reset(serialisedDocument);
     if (websocketProvider) websocketProvider.disconnect();
